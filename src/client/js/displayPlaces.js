@@ -1,21 +1,24 @@
-const displayPlaces = (results) => {
-  clearPlacesList();
-  const container = document.querySelector('.places-list ul');
-  const places = [];
-
-  results.forEach((result) => {
-    places.push({
-      name: result.name,
-      adminName1: result.adminName1,
-      countryName: result.countryName
+export const createArrayOfPlaces = (places) => {
+  const list = [];
+  places.forEach((place) => {
+    list.push({
+      name: place.name,
+      adminName1: place.adminName1,
+      countryName: place.countryName
     });
   });
+  return places;
+};
+
+const displayPlaces = (results) => {
+  clearListDom('.places-list ul li');
+  const container = document.querySelector('.places-list ul');
+  const places = createArrayOfPlaces(results);
 
   // create a list if items
   const placesList = document.createDocumentFragment();
 
   for (let place of places) {
-    // medium and large links
     const newListItem = document.createElement('li');
     newListItem.innerHTML = `${place.name}, ${place.adminName1}, ${place.countryName}`;
     placesList.appendChild(newListItem);
@@ -25,8 +28,8 @@ const displayPlaces = (results) => {
   container.appendChild(placesList);
 };
 
-const clearPlacesList = () => {
-  const listToDelete = document.querySelectorAll('.places-list ul li');
+export const clearListDom = (el) => {
+  const listToDelete = document.querySelectorAll(el);
   listToDelete.forEach(li => li.remove());
 };
 
