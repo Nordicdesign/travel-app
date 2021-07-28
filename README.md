@@ -9,4 +9,4 @@ The goal is to allow users to enter a destination and date of travel, return the
 * `npm start`      - starts the backend server
 * `npm run dev`    - Front end in development mode
 * `npm run build`  - Builds minified for production
-* `npm test`       - Runs test suite with JEST
+* `npm test`       - Runs test suite with JEST and Supertest

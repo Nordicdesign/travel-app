@@ -20,4 +20,8 @@ describe('Travel API', () => {
         );
       });
   });
+  it('Returns 404 if the route is not know', () => {
+    return request(app)
+      .get('/api/something').expect(404);
+  });
 });
