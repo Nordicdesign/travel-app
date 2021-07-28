@@ -1,4 +1,4 @@
-const weatherKey = 'd69699a967d1ef4c9feb76f63a1b09e1';
+const weatherKey = '';
 
 const populatePostcode = () => {
   // Check if there's a location on storage
