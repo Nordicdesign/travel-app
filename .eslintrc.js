@@ -29,6 +29,6 @@ module.exports = {
     'no-trailing-spaces': ['error'],
 
     // Don't use semicolons at the end of your statements
-    'semi': ['error', 'never'],
+    'semi': ['error', 'always'],
   },
 }
