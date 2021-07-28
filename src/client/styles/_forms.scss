@@ -1,0 +1,60 @@
+// FORM MIXINS
+@mixin form-field {
+  padding: $baseline;
+  margin: $baseline/2 0 $baseline;
+}
+
+@mixin form-shadow {
+  box-shadow: 0 1px 1px rgba(0,0,0,0.05),
+              0 2px 2px rgba(0,0,0,0.05),
+              0 4px 4px rgba(0,0,0,0.05),
+              0 8px 8px rgba(0,0,0,0.05);
+}
+
+
+// STYLES
+
+label {
+  display: block;
+  color: white;
+  width: 45%;
+  margin-right: $baseline;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, .8);
+}
+
+input {
+
+}
+
+input[type="date"],
+input[type="text"] {
+  @include form-field;
+  @include form-shadow;
+  width: 100%;
+  border: 1px solid #ddd;
+  height: 50px;
+  border-radius: 4px;
+}
+
+input[type="submit"] {
+  @include form-field;
+  @include form-shadow;
+  background: #ccc;
+  border: none;
+  border-radius: 100px;
+  min-width: 150px;
+  cursor: pointer;
+}
+
+.formError {
+  display: none;
+
+  &.visible {
+    display: block;
+  }
+}
+
+form {
+  display: flex;
+  flex-direction: row;
+}

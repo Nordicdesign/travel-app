@@ -1,0 +1,27 @@
+@import "reset";
+@import "variables";
+@import "forms";
+
+body {
+  font-family: $fontstack;
+  color: $main;
+  background: tomato;
+
+  background: url("../images/s-migaj-Yui5vfKHuzs-unsplash.jpg") no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+.wrapper {
+  width: 96%;
+  max-width: 600px;
+  margin: 20% auto 30px;
+}
+
+h1 {
+  font-size: 3rem;
+  color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, .8);
+}
