@@ -1,4 +1,4 @@
-const weatherKey = '';
+const weatherKey = PROCESS.WEATHERBIT_KEY;
 
 const populatePostcode = () => {
   // Check if there's a location on storage
@@ -6,20 +6,18 @@ const populatePostcode = () => {
   if (storedPostcode) {
     document.getElementById('zip').value = storedPostcode;
   }
-}
+};
 
 const updateUIWithWeather = (data) => {
   const target = document.querySelector('.help-tip');
   if (data == undefined) {
     console.log("Postcode is no good");
-  }
-  else if (data.code === 404) {
+  } else if (data.code === 404) {
     target.innerText = "Can't find that zip code";
-  }
-  else if (data) {
+  } else if (data) {
     target.innerText = `${data.name}, ${data.weather[0].description} ${data.main.temp}C `;
   }
-}
+};
 
 
 // check there's some postcode first
@@ -28,12 +26,11 @@ const checkPostCode = (zip) => {
   if (Number.isInteger(parseFloat(zip)) && zip.length === 5) {
     localStorage.setItem('storedPostcode', zip);
     return true;
-  }
-  else {
+  } else {
     updateUIWithWeather();
     return false;
   }
-}
+};
 
 
 const sendForm = async (e) => {
