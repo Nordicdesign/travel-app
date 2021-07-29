@@ -20,6 +20,10 @@ const displayPlaces = (results) => {
 
   for (let place of places) {
     const newListItem = document.createElement('li');
+    // add latitude and longitude
+    newListItem.setAttribute('data-lat', place.lat);
+    newListItem.setAttribute('data-lng', place.lng);
+    newListItem.setAttribute('data-name', place.name);
     newListItem.innerHTML = `${place.name}, ${place.adminName1}, ${place.countryName}`;
     placesList.appendChild(newListItem);
   }
