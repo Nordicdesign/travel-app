@@ -1,4 +1,5 @@
 import { dateWithinAWeek } from './dates';
+import { getWeatherData } from './weather';
 
 const populateTrip = (data) => {
   if (Object.entries(data).length !== 0) { // if there's an entry already
@@ -94,17 +95,25 @@ export const storeTrip = async (e) => {
   const lat = e.target.lat.value;
   const name = e.target.location.value;
   const date = e.target.when.value;
+
   // check if date is within a week
   // weatherCurrent = true if within a week
   // weatherCurrent = false if date beyond a week
   const weatherCurrent = dateWithinAWeek(date);
   console.log("is it within a week?", weatherCurrent);
+  let weatherType;
+  weatherCurrent === true ? weatherType = 'current' : weatherType = 'forecast/daily';
+
   // gather the weather
-  const weather = await getWeatherData(lat,lon);
+  const weather = await getWeatherData(lat,lon,weatherType );
+  console.log(weather);
+
   //gather the photos
   const photos = await getPhotos(name);
+
   // build the entry
   let tripEntry = await buildTripEntry(name,weather,photos);
+
   // sent post to API
   try {
     const url = 'http://localhost:8080/api/trip';
@@ -120,37 +129,6 @@ export const storeTrip = async (e) => {
     console.log(result);
   } catch (error) {
     console.error(error);
-  }
-};
-
-const getWeatherData = async (lat,lon) => {
-  const weatherKey = process.env.WEATHERBIT_KEY;
-  const url = `http://api.weatherbit.io/v2.0/current?lat=${lat}&lon=${lon}&key=${weatherKey}`;
-  try {
-    let response = await fetch(url);
-    if (response.status === 404) {
-      return {
-        code: 404,
-        msg: "City not found"
-      };
-    }
-    let weatherData = await response.json();
-    // console.log(weatherData.data[0]);
-    return weatherData.data[0];
-  } catch(error) {
-    console.log(error);
-    if (!error.response) {
-      // network error
-      return {
-        code: 400,
-        msg: "No network"
-      };
-    } else {
-      return {
-        code: 400,
-        msg: 'something broke'
-      };
-    }
   }
 };
 
