@@ -5,15 +5,6 @@ const getFormValue = (id) => document.getElementById(id).value;
 
 let timer;
 const waitTime = 300;
-//
-// const findLocations = async (text) => {
-//   try {
-//     const result = await placeDetails(place);
-//
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
 
 const placeDetails = async (place) => {
   const geonamesKey = process.env.GEONAMES_KEY;
