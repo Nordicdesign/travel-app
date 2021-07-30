@@ -88,23 +88,18 @@ export const selectDestination = (e) => {
 
 export const storeTrip = async (e) => {
   e.preventDefault();
-  // get the place
-  const target = e.target;
-  console.log(target.location.value);
-  console.log(target.lat.value);
-  console.log(target.lon.value);
-  console.log(target.when.value);
-  // const lon = target.dataset.lng;
-  // const lat = target.dataset.lat;
-  // const name = target.dataset.name;
+  // get the data
+  const lon = e.target.lon.value;
+  const lat = e.target.lat.value;
+  const name = e.target.location.value;
+  const date = e.target.when.value;
   // gather the weather
-  // const weather = await getWeatherData(lat,lon);
+  const weather = await getWeatherData(lat,lon);
   //gather the photos
-  // const photos = await getPhotos(name);
+  const photos = await getPhotos(name);
   // build the entry
-  // let tripEntry = await buildTripEntry(name,weather,photos);
+  let tripEntry = await buildTripEntry(name,weather,photos);
   // sent post to API
-
   try {
     const url = 'http://localhost:8080/api/trip';
     let response = await fetch(url, {
