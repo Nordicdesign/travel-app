@@ -76,6 +76,11 @@ const buildTripEntry = async (name, weather, photos) => {
   };
 };
 
+const hideResults = (name) => {
+  document.querySelector('.places-list').classList.remove('visible');
+  document.getElementById('location').value = name;
+};
+
 
 export const storeTrip = async (e) => {
   // get the place
@@ -83,6 +88,8 @@ export const storeTrip = async (e) => {
   const lon = target.dataset.lng;
   const lat = target.dataset.lat;
   const name = target.dataset.name;
+  // hide the search results
+  hideResults(name);
   // gather the weather
   const weather = await getWeatherData(lat,lon);
   //gather the photos

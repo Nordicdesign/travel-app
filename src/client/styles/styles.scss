@@ -36,6 +36,28 @@ h2 {
 
 .places-list {
   @include card;
+  display: none;
+  width: 70%;
+  padding: 0 $baseline;
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      padding: $baseline 0;
+      border-bottom: 1px solid #ccc;
+      cursor: pointer;
+
+      &:last-of-type {
+        border: none;
+      }
+    }
+  }
+  &.visible {
+    display: block;
+  }
 }
 
 .images-list {

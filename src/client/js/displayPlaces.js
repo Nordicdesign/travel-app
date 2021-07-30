@@ -36,6 +36,7 @@ const displayPlaces = (results) => {
 
   // append them to the navigation
   container.appendChild(placesList);
+  document.querySelector('.places-list').classList.add('visible');
 };
 
 export const clearListDom = (el) => {
