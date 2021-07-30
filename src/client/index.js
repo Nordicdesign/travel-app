@@ -2,8 +2,7 @@ import './styles/styles.scss';
 import 'regenerator-runtime/runtime.js'; // to bring async to babel
 import formHandler from './js/formHandler';
 import { selectDestination, storeTrip } from './js/app';
-
-// get tomorrow's date, prepopulate the form
+import { populateDate } from './js/dates';
 
 // auto suggest on the destination form
 
@@ -14,4 +13,9 @@ export const runTheThings = () => {
   document.getElementById('placesForm').addEventListener('submit', storeTrip);
 };
 
-document.addEventListener('DOMContentLoaded', () => runTheThings());
+document.addEventListener('DOMContentLoaded', () => {
+  // get tomorrow's date, prepopulate the form
+  populateDate();
+  // add event listeners
+  runTheThings();
+});

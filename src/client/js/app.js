@@ -1,3 +1,4 @@
+import { dateWithinAWeek } from './dates';
 
 const populateTrip = (data) => {
   if (Object.entries(data).length !== 0) { // if there's an entry already
@@ -93,6 +94,11 @@ export const storeTrip = async (e) => {
   const lat = e.target.lat.value;
   const name = e.target.location.value;
   const date = e.target.when.value;
+  // check if date is within a week
+  // weatherCurrent = true if within a week
+  // weatherCurrent = false if date beyond a week
+  const weatherCurrent = dateWithinAWeek(date);
+  console.log("is it within a week?", weatherCurrent);
   // gather the weather
   const weather = await getWeatherData(lat,lon);
   //gather the photos

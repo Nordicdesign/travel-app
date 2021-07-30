@@ -1,7 +1,7 @@
 import 'regenerator-runtime/runtime.js'; // to bring async to babel
 import displayPlaces from './displayPlaces';
 
-const getFormValue = (id) => document.getElementById(id).value;
+// const getFormValue = (id) => document.getElementById(id).value;
 
 let timer;
 const waitTime = 300;
