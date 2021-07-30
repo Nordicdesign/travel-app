@@ -18,6 +18,6 @@ export const dateWithinAWeek = (date) => {
   if (days <= 7) {
     return true;
   } else {
-    return false;
+    return days;
   };
 };

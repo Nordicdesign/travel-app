@@ -101,11 +101,18 @@ export const storeTrip = async (e) => {
   // weatherCurrent = false if date beyond a week
   const weatherCurrent = dateWithinAWeek(date);
   console.log("is it within a week?", weatherCurrent);
-  let weatherType;
-  weatherCurrent === true ? weatherType = 'current' : weatherType = 'forecast/daily';
+  let weatherType; // current or forecast
+  let weatherDay; // current (0) or days the future
+  if (weatherCurrent === true) {
+    weatherType = 'current';
+    weatherDay = 0;
+  } else {
+    weatherType = 'forecast/daily';
+    weatherDay = weatherCurrent; // send the number of days in the future we need the weather
+  };
 
   // gather the weather
-  const weather = await getWeatherData(lat,lon,weatherType );
+  const weather = await getWeatherData(lat,lon,weatherType,weatherDay);
   console.log(weather);
 
   //gather the photos

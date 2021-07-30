@@ -1,7 +1,8 @@
-export const getWeatherData = async (lat,lon, type) => {
+export const getWeatherData = async (lat,lon, type, weatherDay) => {
   const weatherKey = process.env.WEATHERBIT_KEY;
-  console.log(type);
+  const when = Math.round(weatherDay);
   const url = `http://api.weatherbit.io/v2.0/${type}?lat=${lat}&lon=${lon}&key=${weatherKey}`;
+
   try {
     let response = await fetch(url);
     if (response.status === 404) {
@@ -11,8 +12,8 @@ export const getWeatherData = async (lat,lon, type) => {
       };
     }
     let weatherData = await response.json();
-    // console.log(weatherData.data[0]);
-    return weatherData.data[0];
+    console.log(weatherData);
+    return weatherData.data[when];
   } catch(error) {
     console.log(error);
     if (!error.response) {
