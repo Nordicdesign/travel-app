@@ -1,3 +1,8 @@
+const orderByPopulation = (places) => {
+  const ordered = places.sort((a, b) => b.population - a.population);
+  return ordered;
+};
+
 export const createArrayOfPlaces = (places) => {
   const list = [];
   places.forEach((place) => {
@@ -13,7 +18,8 @@ export const createArrayOfPlaces = (places) => {
 const displayPlaces = (results) => {
   clearListDom('.places-list ul li');
   const container = document.querySelector('.places-list ul');
-  const places = createArrayOfPlaces(results);
+  const orderedPlaces = orderByPopulation((results));
+  const places = createArrayOfPlaces(orderedPlaces);
 
   // create a list if items
   const placesList = document.createDocumentFragment();

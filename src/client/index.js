@@ -1,7 +1,7 @@
 import './styles/styles.scss';
 import 'regenerator-runtime/runtime.js'; // to bring async to babel
 import formHandler from './js/formHandler';
-import { getWeatherData } from './js/app';
+import { storeTrip } from './js/app';
 
 // get tomorrow's date, prepopulate the form
 
@@ -9,8 +9,8 @@ import { getWeatherData } from './js/app';
 
 // add eventhandler for the form
 export const runTheThings = () => {
-  document.querySelector('.places-list').addEventListener('click', getWeatherData);
+  document.querySelector('.places-list').addEventListener('click', storeTrip);
   document.getElementById('placesForm').addEventListener('submit', formHandler);
 };
 
-runTheThings();
+document.addEventListener('DOMContentLoaded', () => runTheThings());

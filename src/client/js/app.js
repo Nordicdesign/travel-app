@@ -1,24 +1,57 @@
-const weatherKey = process.env.WEATHERBIT_KEY;
-
-
-const sendForm = async (e) => {
-  e.preventDefault();
-  storeFeelings()
-    .then(() => displayRecentFeeling());
-};
 
 const populateTrip = (data) => {
   if (Object.entries(data).length !== 0) { // if there's an entry already
-    const {date, temp, content} = data;
-    document.getElementById('date').innerHTML = date;
-    document.getElementById('temp').innerHTML = temp + 'C';
-    document.getElementById('content').innerHTML = content;
+    const container = document.querySelector('.trips-container');
+    const {name, photos, weather} = data;
+
+    // build the container
+    const tripContainer = document.createDocumentFragment();
+    const tripDiv = document.createElement('div');
+    tripDiv.setAttribute('class', 'trip-entry');
+    tripDiv.setAttribute('data-leg', '1');
+
+    // add the header - where are you going
+    const nameDiv = document.createElement('div');
+    nameDiv.setAttribute('class', 'trip-entry--location');
+    const location = document.createElement('h3');
+    location.innerHTML = name;
+    nameDiv.appendChild(location);
+
+
+    // show the weather on the place
+    const weatherInfo = document.createElement('p');
+    weatherInfo.innerHTML = `Clouds: ${weather.clouds}, Temp: ${weather.temp}℃`;
+    nameDiv.appendChild(weatherInfo);
+
+    // append the name and weather to the location div
+    tripDiv.appendChild(nameDiv);
+
+    // Display some photos
+    const photosList = document.createDocumentFragment();
+    const photoDiv = document.createElement('div');
+    photoDiv.setAttribute('class', 'trip-entry--photos');
+
+    for (let photo of photos.hits) {
+      const newPhoto = document.createElement('img');
+      // add latitude and longitude
+      newPhoto.setAttribute('src', photo.previewURL);
+      newPhoto.setAttribute('alt', photo.tags);
+      photoDiv.appendChild(newPhoto);
+    }
+    photosList.appendChild(photoDiv);
+
+    // append them to the navigation
+    tripDiv.appendChild(photosList); // append the photos to the overall container
+
+    // add the whole thing to the container
+    tripContainer.appendChild(tripDiv);
+    container.appendChild(tripContainer);
   }
 };
 
 
-const displayTrip = async () => {
-  const url = 'http://localhost:8080/all';
+const gatherTrip = async () => {
+  const url = 'http://localhost:8080/api/trip';
   try {
     const response = await fetch(url);
     const result = await response.json();
@@ -28,54 +61,54 @@ const displayTrip = async () => {
   }
 };
 
-const buildTripEntry = async () => {
-  // check weather
-  let currentWeather = sessionStorage.getItem('weather');
-  if (!currentWeather) {
-    await checkWeather();
-    currentWeather = sessionStorage.getItem('weather');
-  }
-  let weather = JSON.parse(currentWeather);
-  const feelings = document.getElementById('feelings').value;
+const buildTripEntry = async (name, weather, photos) => {
   const date = new Date();
   const rightNow = date.toLocaleString('en-gb',{
     dateStyle: 'long',
     timeStyle: 'short'
   });
-
+  console.log("the photos", photos);
   return {
     'date': rightNow,
-    'temp': weather.main.temp,
-    'content': feelings
+    'name': name,
+    'weather': weather,
+    'photos': photos
   };
 };
 
 
-const storeTrip = async () => {
+export const storeTrip = async (e) => {
+  // get the place
+  const target = e.target;
+  const lon = target.dataset.lng;
+  const lat = target.dataset.lat;
+  const name = target.dataset.name;
+  // gather the weather
+  const weather = await getWeatherData(lat,lon);
+  //gather the photos
+  const photos = await getPhotos(name);
   // build the entry
-  let tripEntry = await buildPostEntry();
+  let tripEntry = await buildTripEntry(name,weather,photos);
   // sent post to API
-  const url = 'http://localhost:8080/journal';
-  let response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json;charset=utf-8'
-    },
-    body: JSON.stringify(tripEntry)
-  });
+  const url = 'http://localhost:8080/api/trip';
   try {
+    let response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8'
+      },
+      body: JSON.stringify(tripEntry)
+    });
     let result = await response.json();
-    sessionStorage.clear('weather'); // clear to ensure we got fresh weather each time
+    result.code === 200 ? gatherTrip() : null;
+    console.log(result);
   } catch (error) {
     console.error(error);
   }
 };
 
-export const getWeatherData = async (e) => {
-  const target = e.target;
-  const lon = target.dataset.lng;
-  const lat = target.dataset.lat;
-  // console.log(target.dataset.name);
+const getWeatherData = async (lat,lon) => {
+  const weatherKey = process.env.WEATHERBIT_KEY;
   const url = `http://api.weatherbit.io/v2.0/current?lat=${lat}&lon=${lon}&key=${weatherKey}`;
   try {
     let response = await fetch(url);
@@ -86,8 +119,8 @@ export const getWeatherData = async (e) => {
       };
     }
     let weatherData = await response.json();
-    console.log(weatherData.data[0]);
-    // return weatherData;
+    // console.log(weatherData.data[0]);
+    return weatherData.data[0];
   } catch(error) {
     console.log(error);
     if (!error.response) {
@@ -105,15 +138,13 @@ export const getWeatherData = async (e) => {
   }
 };
 
-const checkWeather = async () => {
+const getPhotos = async (name) => {
+  const pixabayKey = process.env.PIXABAY_KEY;
+  const url = `https://pixabay.com/api/?key=${pixabayKey}&q=${name}&image_type=photo&per_page=10`;
   try {
-    let response = await getWeatherData(zip);
-    if (response.code !== 404) {
-      sessionStorage.setItem('weather', JSON.stringify(response));
-      updateUIWithWeather(response);
-    } else {
-      updateUIWithWeather(response);
-    }
+    const response = await fetch(url);
+    const result = await response.json();
+    return result;
   } catch (error) {
     console.error(error);
   }

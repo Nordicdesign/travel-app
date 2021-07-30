@@ -10,3 +10,10 @@
               0 4px 4px rgba(0,0,0,0.05),
               0 8px 8px rgba(0,0,0,0.05);
 }
+
+@mixin card {
+  @include form-shadow;
+  background: white;
+  border-radius: 4px;
+  padding: $baseline;
+}

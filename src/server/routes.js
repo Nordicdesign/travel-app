@@ -3,15 +3,15 @@ var router = express.Router();
 const utils = require('./utils');
 const { saveTripData, projectData } = require('./utils');
 
-router.get('/all', async function(req, res) {
+router.get('/trip', async function(req, res) {
   res.send(projectData);
 });
 
 
-router.post('/journal', async function(req, res) {
+router.post('/trip', async function(req, res) {
   console.log("data start", projectData);
   try {
-    saveProjectData(req.body);
+    saveTripData(req.body);
     let response = {
       'code': 200,
       'msg': req.body
