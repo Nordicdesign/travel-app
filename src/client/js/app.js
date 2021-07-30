@@ -76,20 +76,22 @@ const buildTripEntry = async (name, weather, photos) => {
   };
 };
 
-const hideResults = (name) => {
+export const selectDestination = (e) => {
+  const target = e.target;
+  document.getElementById('lon').value = target.dataset.lng;
+  document.getElementById('lat').value = target.dataset.lat;
+  document.getElementById('location').value = target.dataset.name;
+  // hide the search results
   document.querySelector('.places-list').classList.remove('visible');
-  document.getElementById('location').value = name;
 };
 
 
-export const storeTrip = async (e) => {
+export const storeTrip = async (data) => {
   // get the place
-  const target = e.target;
-  const lon = target.dataset.lng;
-  const lat = target.dataset.lat;
-  const name = target.dataset.name;
-  // hide the search results
-  hideResults(name);
+  // const target = e.target;
+  // const lon = target.dataset.lng;
+  // const lat = target.dataset.lat;
+  // const name = target.dataset.name;
   // gather the weather
   const weather = await getWeatherData(lat,lon);
   //gather the photos

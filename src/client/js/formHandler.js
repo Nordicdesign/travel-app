@@ -3,28 +3,37 @@ import displayPlaces from './displayPlaces';
 
 const getFormValue = (id) => document.getElementById(id).value;
 
+let timer;
+const waitTime = 300;
+//
+// const findLocations = async (text) => {
+//   try {
+//     const result = await placeDetails(place);
+//
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
+
 const placeDetails = async (place) => {
   const geonamesKey = process.env.GEONAMES_KEY;
   const apiUrl = `http://api.geonames.org/searchJSON?name=${place}&maxRows=50&username=${geonamesKey}&cities=cities1000`;
   try {
     const response = await fetch(apiUrl);
     const result = await response.json();
-    return result;
+    console.log(result.geonames);
+    displayPlaces(result.geonames);
   } catch (error) {
     console.error(error);
   }
 };
 
 export default async function formHandler(e) {
-  e.preventDefault();
-  const place = getFormValue('location');
-  try {
-    const result = await placeDetails(place);
-    console.log(result.geonames);
-    displayPlaces(result.geonames);
-  } catch (error) {
-    console.log(error);
-  }
+  const place = e.currentTarget.value;
+  clearTimeout(timer);
+  timer = setTimeout(() => {
+    placeDetails(place);
+  }, waitTime);
 }
 
 // export function formFeedback(error) {
