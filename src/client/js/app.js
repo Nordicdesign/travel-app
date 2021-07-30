@@ -1,173 +1,158 @@
-const weatherKey = PROCESS.WEATHERBIT_KEY;
 
-const populatePostcode = () => {
-  // Check if there's a location on storage
-  let storedPostcode = localStorage.getItem('storedPostcode');
-  if (storedPostcode) {
-    document.getElementById('zip').value = storedPostcode;
-  }
-};
-
-const updateUIWithWeather = (data) => {
-  const target = document.querySelector('.help-tip');
-  if (data == undefined) {
-    console.log("Postcode is no good");
-  } else if (data.code === 404) {
-    target.innerText = "Can't find that zip code";
-  } else if (data) {
-    target.innerText = `${data.name}, ${data.weather[0].description} ${data.main.temp}C `;
-  }
-};
-
-
-// check there's some postcode first
-// and it's numbers only because US
-const checkPostCode = (zip) => {
-  if (Number.isInteger(parseFloat(zip)) && zip.length === 5) {
-    localStorage.setItem('storedPostcode', zip);
-    return true;
-  } else {
-    updateUIWithWeather();
-    return false;
-  }
-};
-
-
-const sendForm = async (e) => {
-  e.preventDefault();
-  storeFeelings()
-  .then(() => displayRecentFeeling());
-}
-
-const populateRecentEntry = (data) => {
+const populateTrip = (data) => {
   if (Object.entries(data).length !== 0) { // if there's an entry already
-    const {date, temp, content} = data;
-    document.getElementById('date').innerHTML = date;
-    document.getElementById('temp').innerHTML = temp + 'C';
-    document.getElementById('content').innerHTML = content;
+    const container = document.querySelector('.trips-container');
+    const {name, photos, weather} = data;
+
+    // build the container
+    const tripContainer = document.createDocumentFragment();
+    const tripDiv = document.createElement('div');
+    tripDiv.setAttribute('class', 'trip-entry');
+    tripDiv.setAttribute('data-leg', '1');
+
+    // add the header - where are you going
+    const nameDiv = document.createElement('div');
+    nameDiv.setAttribute('class', 'trip-entry--location');
+    const location = document.createElement('h3');
+    location.innerHTML = name;
+    nameDiv.appendChild(location);
+
+
+    // show the weather on the place
+    const weatherInfo = document.createElement('p');
+    weatherInfo.innerHTML = `Clouds: ${weather.clouds}, Temp: ${weather.temp}℃`;
+    nameDiv.appendChild(weatherInfo);
+
+    // append the name and weather to the location div
+    tripDiv.appendChild(nameDiv);
+
+    // Display some photos
+    const photosList = document.createDocumentFragment();
+    const photoDiv = document.createElement('div');
+    photoDiv.setAttribute('class', 'trip-entry--photos');
+
+    for (let photo of photos.hits) {
+      const newPhoto = document.createElement('img');
+      // add latitude and longitude
+      newPhoto.setAttribute('src', photo.previewURL);
+      newPhoto.setAttribute('alt', photo.tags);
+      photoDiv.appendChild(newPhoto);
+    }
+    photosList.appendChild(photoDiv);
+
+    // append them to the navigation
+    tripDiv.appendChild(photosList); // append the photos to the overall container
+
+    // add the whole thing to the container
+    tripContainer.appendChild(tripDiv);
+    container.appendChild(tripContainer);
   }
-}
+};
 
 
-const displayRecentFeeling = async () => {
-  const url = 'http://localhost:8080/all';
+const gatherTrip = async () => {
+  const url = 'http://localhost:8080/api/trip';
   try {
-    let response = await fetch(url);
-    let result = await response.json();
-    populateRecentEntry(result);
-  }
-  catch (error) {
+    const response = await fetch(url);
+    const result = await response.json();
+    populateTrip(result);
+  } catch (error) {
     console.error(error);
   }
-}
+};
 
-const buildPostEntry = async () => {
-  // check weather
-  let currentWeather = sessionStorage.getItem('weather');
-  if (!currentWeather) {
-      await checkWeather();
-      currentWeather = sessionStorage.getItem('weather');
-  }
-  let weather = JSON.parse(currentWeather);
-  const feelings = document.getElementById('feelings').value;
+const buildTripEntry = async (name, weather, photos) => {
   const date = new Date();
   const rightNow = date.toLocaleString('en-gb',{
-                      dateStyle: 'long',
-                      timeStyle: 'short'
-                    });
-
+    dateStyle: 'long',
+    timeStyle: 'short'
+  });
+  console.log("the photos", photos);
   return {
     'date': rightNow,
-    'temp': weather.main.temp,
-    'content': feelings
-  }
-}
+    'name': name,
+    'weather': weather,
+    'photos': photos
+  };
+};
+
+const hideResults = (name) => {
+  document.querySelector('.places-list').classList.remove('visible');
+  document.getElementById('location').value = name;
+};
 
 
-const storeFeelings = async () => {
+export const storeTrip = async (e) => {
+  // get the place
+  const target = e.target;
+  const lon = target.dataset.lng;
+  const lat = target.dataset.lat;
+  const name = target.dataset.name;
+  // hide the search results
+  hideResults(name);
+  // gather the weather
+  const weather = await getWeatherData(lat,lon);
+  //gather the photos
+  const photos = await getPhotos(name);
   // build the entry
-  let journalEntry = await buildPostEntry();
+  let tripEntry = await buildTripEntry(name,weather,photos);
   // sent post to API
-  const url = 'http://localhost:8080/journal';
-  let response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json;charset=utf-8'
-    },
-    body: JSON.stringify(journalEntry)
-  });
+  const url = 'http://localhost:8080/api/trip';
   try {
+    let response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8'
+      },
+      body: JSON.stringify(tripEntry)
+    });
     let result = await response.json();
-    sessionStorage.clear('weather'); // clear to ensure we got fresh weather each time
-  }
-  catch (error) {
+    result.code === 200 ? gatherTrip() : null;
+    console.log(result);
+  } catch (error) {
     console.error(error);
   }
-}
+};
 
-const getWeatherData = async (zip) => {
-  const url = 'https://api.openweathermap.org/data/2.5/weather?zip=';
+const getWeatherData = async (lat,lon) => {
+  const weatherKey = process.env.WEATHERBIT_KEY;
+  const url = `http://api.weatherbit.io/v2.0/current?lat=${lat}&lon=${lon}&key=${weatherKey}`;
   try {
-    let response = await fetch(url+zip+",us&units=metric&APPID="+weatherKey);
+    let response = await fetch(url);
     if (response.status === 404) {
       return {
         code: 404,
         msg: "City not found"
-      }
+      };
     }
     let weatherData = await response.json();
-    return weatherData;
-  }
-  catch(error) {
+    // console.log(weatherData.data[0]);
+    return weatherData.data[0];
+  } catch(error) {
     console.log(error);
     if (!error.response) {
       // network error
       return {
         code: 400,
         msg: "No network"
-      }
-    }
-    else {
+      };
+    } else {
       return {
         code: 400,
         msg: 'something broke'
-      }
+      };
     }
   }
-}
+};
 
-
-const checkWeather = async () => {
-  document.querySelector('.error').classList.remove('visible');
-  const zip = document.getElementById('zip').value;
-  const isItValid = checkPostCode(zip);
-
-  if (isItValid) {
-    try {
-      let response = await getWeatherData(zip)
-      if (response.code !== 404) {
-        sessionStorage.setItem('weather', JSON.stringify(response))
-        updateUIWithWeather(response);
-      }
-      else {
-        updateUIWithWeather(response);
-      }
-    }
-    catch (error) {
-      console.error(error);
-    }
+const getPhotos = async (name) => {
+  const pixabayKey = process.env.PIXABAY_KEY;
+  const url = `https://pixabay.com/api/?key=${pixabayKey}&q=${name}&image_type=photo&per_page=10`;
+  try {
+    const response = await fetch(url);
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error(error);
   }
-  else {
-    document.querySelector('.error').classList.add('visible');
-  }
-}
-
-const start = () => {
-  populatePostcode();
-  displayRecentFeeling();
-  document.getElementById('generate').addEventListener('click', sendForm);
-  document.getElementById('zip').addEventListener('blur', checkWeather);
-}
-
-// do the things
-start();
+};

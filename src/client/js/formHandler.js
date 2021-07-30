@@ -1,19 +1,29 @@
-// import checkURL from './checkURL'
-// import analyseSentiment from './analyseSentiment
+import 'regenerator-runtime/runtime.js'; // to bring async to babel
 import displayPlaces from './displayPlaces';
 
 const getFormValue = (id) => document.getElementById(id).value;
+
+const placeDetails = async (place) => {
+  const geonamesKey = process.env.GEONAMES_KEY;
+  const apiUrl = `http://api.geonames.org/searchJSON?name=${place}&maxRows=50&username=${geonamesKey}&cities=cities1000`;
+  try {
+    const response = await fetch(apiUrl);
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 export default async function formHandler(e) {
   e.preventDefault();
   const place = getFormValue('location');
   try {
-    const response = await fetch(`http://localhost:8080/places/${place}`);
-    const result = await response.json();
-    console.log(result);
+    const result = await placeDetails(place);
+    console.log(result.geonames);
     displayPlaces(result.geonames);
   } catch (error) {
-    console.error(error);
+    console.log(error);
   }
 }
 

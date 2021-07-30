@@ -8,10 +8,6 @@ label {
   text-shadow: 1px 1px 2px rgba(0, 0, 0, .8);
 }
 
-input {
-
-}
-
 input[type="date"],
 input[type="text"] {
   @include form-field;
@@ -25,11 +21,21 @@ input[type="text"] {
 input[type="submit"] {
   @include form-field;
   @include form-shadow;
-  background: #ccc;
+  background: #1836ad;
   border: none;
-  border-radius: 100px;
+  font-weight: bold;
+  line-height: 1.3;
+  color: white;
+  border-radius: 4px;
   min-width: 150px;
+  height: 48px;
   cursor: pointer;
+  transition: 0.2s all ease;
+
+  &:hover,
+  &:focus {
+    background: darken(#1836ad, 20);
+  }
 }
 
 .formError {
@@ -43,4 +49,5 @@ input[type="submit"] {
 form {
   display: flex;
   flex-direction: row;
+  align-items: flex-end;
 }
