@@ -28,9 +28,9 @@ router.post('/trip', async function(req, res) {
 });
 
 
-// router.get('/places/:place', async function(req,res) {
-//   const result = await utils.places(req.params.place);
-//   res.json(result);
-// });
+router.get('/places/:place', async function(req,res) {
+  const result = await utils.places(req.params.place);
+  res.json(result);
+});
 
 module.exports = router;
