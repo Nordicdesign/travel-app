@@ -1,6 +1,8 @@
 import { dateWithinAWeek } from './dates';
 import { getWeatherData } from './weather';
 
+const getFormValue = (id) => document.getElementById(id).value;
+
 const populateTrip = (data) => {
   if (Object.entries(data).length !== 0) { // if there's an entry already
     const container = document.querySelector('.trips-container');
@@ -100,8 +102,22 @@ export const selectDestination = (e) => {
 };
 
 
+const checkIfDestinationEmpty = () => {
+  const place = getFormValue("location");
+  if (place === "") {
+    return true;
+  } else {
+    return false;
+  }
+};
+
+
 export const storeTrip = async (e) => {
   e.preventDefault();
+  if (checkIfDestinationEmpty() === true) {
+    document.querySelector(".error").classList.add("error-visible");
+    return;
+  }
   // get the data
   const lon = e.target.lon.value;
   const lat = e.target.lat.value;

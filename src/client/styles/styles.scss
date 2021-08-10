@@ -108,3 +108,27 @@ h2 {
     margin: 0 $baseline $baseline 0;
   }
 }
+
+.error {
+  @include card;
+  background: $warning;
+  position: relative;
+  margin-top: 0;
+  display: none;
+  
+  &.error-visible {
+    display: block;
+  }
+
+  &::before {
+    content: "";
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid $warning;
+    position: absolute;
+    top: -10px;
+    left: $baseline;
+  }
+}
