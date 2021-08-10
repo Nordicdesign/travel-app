@@ -22,8 +22,15 @@ const populateTrip = (data) => {
 
     // show the weather on the place
     const weatherInfo = document.createElement('p');
-    weatherInfo.innerHTML = `Clouds: ${weather.clouds}, Temp: ${weather.temp}℃`;
+    weatherInfo.innerHTML = `${weather.temp}℃`;
+    weatherInfo.setAttribute('class', 'temperature');
     nameDiv.appendChild(weatherInfo);
+
+    // show the weather icon on the place
+    const weatherIcon = document.createElement('img');
+    weatherIcon.setAttribute('src', `https://www.weatherbit.io/static/img/icons/${weather.weather.icon}.png`);
+    weatherIcon.setAttribute('alt', weather.weather.description);
+    nameDiv.appendChild(weatherIcon);
 
     // append the name and weather to the location div
     tripDiv.appendChild(nameDiv);
@@ -48,6 +55,11 @@ const populateTrip = (data) => {
     // add the whole thing to the container
     tripContainer.appendChild(tripDiv);
     container.appendChild(tripContainer);
+
+    // make the thing visible
+    document.querySelector('.trips-container').classList.add('visible');
+    // move the content to the top
+    document.querySelector('.wrapper').classList.add('results');
   }
 };
 
@@ -141,7 +153,7 @@ export const storeTrip = async (e) => {
 
 const getPhotos = async (name) => {
   const pixabayKey = process.env.PIXABAY_KEY;
-  const url = `https://pixabay.com/api/?key=${pixabayKey}&q=${name}&image_type=photo&per_page=10`;
+  const url = `https://pixabay.com/api/?key=${pixabayKey}&q=${name}&image_type=photo&per_page=3`;
   try {
     const response = await fetch(url);
     const result = await response.json();

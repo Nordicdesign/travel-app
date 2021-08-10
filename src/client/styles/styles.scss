@@ -19,6 +19,12 @@ body {
   width: 96%;
   max-width: 600px;
   margin: 20% auto 30px;
+  transition: 0.2s all ease;
+
+  &.results {
+    margin-top: $baseline;
+  }
+
 }
 
 h1 {
@@ -70,4 +76,35 @@ h2 {
 .trip-entry {
   @include card;
   margin-bottom: $baseline;
+}
+
+.trips-container {
+  display: none;
+  &.visible {
+    display: block;
+  }
+}
+
+.trip-entry--location {
+  h3 {
+    margin-bottom: 0;
+  }
+
+  p.temperature {
+    font-size: 2rem;
+    font-weight: bold;
+    display: inline-block;
+    margin: 0 0 $baseline;
+  }
+
+  img {
+    max-width: 67px;
+    vertical-align: bottom;
+  }
+}
+
+.trip-entry--photos {
+  img {
+    margin: 0 $baseline $baseline 0;
+  }
 }

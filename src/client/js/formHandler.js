@@ -7,8 +7,7 @@ let timer;
 const waitTime = 300;
 
 const placeDetails = async (place) => {
-  const geonamesKey = process.env.GEONAMES_KEY;
-  const apiUrl = `http://api.geonames.org/searchJSON?name=${place}&maxRows=50&username=${geonamesKey}&cities=cities1000`;
+  const apiUrl = `http://localhost:8080/api/places/${place}`;
   try {
     const response = await fetch(apiUrl);
     const result = await response.json();
