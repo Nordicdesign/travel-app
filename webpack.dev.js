@@ -12,6 +12,11 @@ module.exports = {
     contentBase: './dist',
   },
   entry: './src/client/index.js',
+  resolve: {
+    fallback: {
+      "url": false
+    }
+  },
   module: {
     rules: [
       {

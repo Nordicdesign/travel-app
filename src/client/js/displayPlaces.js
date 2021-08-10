@@ -15,6 +15,11 @@ export const createArrayOfPlaces = (places) => {
   return places;
 };
 
+export const clearListDom = (el) => {
+  const listToDelete = document.querySelectorAll(el);
+  listToDelete.forEach(li => li.remove());
+};
+
 const displayPlaces = (results) => {
   clearListDom('.places-list ul li');
   const container = document.querySelector('.places-list ul');
@@ -37,11 +42,6 @@ const displayPlaces = (results) => {
   // append them to the navigation
   container.appendChild(placesList);
   document.querySelector('.places-list').classList.add('visible');
-};
-
-export const clearListDom = (el) => {
-  const listToDelete = document.querySelectorAll(el);
-  listToDelete.forEach(li => li.remove());
 };
 
 export default displayPlaces;

@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
-const utils = require('./utils');
-const { saveTripData, projectData } = require('./utils');
+const { getWeatherData, places, saveTripData, projectData } = require('./utils');
 
 router.get('/trip', async function(req, res) {
   res.send(projectData);
@@ -27,9 +26,17 @@ router.post('/trip', async function(req, res) {
   }
 });
 
+router.post('/weather', async function(req, res) {
+  // console.log(req.body);
+  const { type, lat, lon, weatherDay } = req.body;
+  const result = await getWeatherData(lat,lon, type, weatherDay);
+  console.log(result);
+  res.send(result);
+});
+
 
 router.get('/places/:place', async function(req,res) {
-  const result = await utils.places(req.params.place);
+  const result = await places(req.params.place);
   res.json(result);
 });
 
