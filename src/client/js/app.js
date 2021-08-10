@@ -3,10 +3,17 @@ import { getWeatherData } from './weather';
 
 const getFormValue = (id) => document.getElementById(id).value;
 
+const timeToTrip = (date) => {
+  const today = new Date();
+  const tripDate = new Date(date.replace('-', ','));
+  const difference = (tripDate - today) / (1000 * 3600 * 24);
+  return difference;
+};
+
 const populateTrip = (data) => {
   if (Object.entries(data).length !== 0) { // if there's an entry already
     const container = document.querySelector('.trips-container');
-    const {name, photos, weather} = data;
+    const {name, photos, weather, date} = data;
 
     // build the container
     const tripContainer = document.createDocumentFragment();
@@ -18,7 +25,13 @@ const populateTrip = (data) => {
     const nameDiv = document.createElement('div');
     nameDiv.setAttribute('class', 'trip-entry--location');
     const location = document.createElement('h3');
-    location.innerHTML = name;
+    // show how long until the trip
+    const timeLeft = timeToTrip(date);
+    if (timeLeft < 1) {
+      location.innerHTML = `${name} <span>Less than a day to go</span>`;
+    } else {
+      location.innerHTML = `${name} <span>${Math.floor(timeLeft)} days to go</span>`;
+    }
     nameDiv.appendChild(location);
 
 
@@ -36,6 +49,8 @@ const populateTrip = (data) => {
 
     // append the name and weather to the location div
     tripDiv.appendChild(nameDiv);
+
+
 
     // Display some photos
     const photosList = document.createDocumentFragment();
@@ -66,7 +81,7 @@ const populateTrip = (data) => {
 };
 
 
-const gatherTrip = async () => {
+export const gatherTrip = async () => {
   const url = 'http://localhost:8080/api/trip';
   try {
     const response = await fetch(url);
@@ -77,15 +92,15 @@ const gatherTrip = async () => {
   }
 };
 
-const buildTripEntry = async (name, weather, photos) => {
-  const date = new Date();
-  const rightNow = date.toLocaleString('en-gb',{
-    dateStyle: 'long',
-    timeStyle: 'short'
-  });
+const buildTripEntry = async (name, weather, photos, date) => {
+  // const date = new Date();
+  // const rightNow = date.toLocaleString('en-gb',{
+  //   dateStyle: 'long',
+  //   timeStyle: 'short'
+  // });
   console.log("the photos", photos);
   return {
-    'date': rightNow,
+    'date': date,
     'name': name,
     'weather': weather,
     'photos': photos
@@ -147,7 +162,7 @@ export const storeTrip = async (e) => {
   const photos = await getPhotos(name);
 
   // build the entry
-  let tripEntry = await buildTripEntry(name,weather,photos);
+  let tripEntry = await buildTripEntry(name,weather,photos,date);
 
   // sent post to API
   try {
