@@ -1,4 +1,4 @@
-import { createArrayOfPlaces, clearListDom } from './displayPlaces';
+import { createArrayOfPlaces } from './displayPlaces';
 
 test('list is created from an array', () => {
   const list = [{

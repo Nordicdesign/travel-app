@@ -1,7 +1,26 @@
+import { v4 as uuidv4 } from 'uuid';
 import { dateWithinAWeek } from './dates';
 import { getWeatherData } from './weather';
+import { clearListDom } from './utils';
 
 const getFormValue = (id) => document.getElementById(id).value;
+
+
+const deleteAnEntry = async (e) => {
+  e.preventDefault();
+  const id = e.path[0].dataset.id;
+  try {
+    const response = await fetch(`http://localhost:8080/api/trip/${id}`, {
+      method: 'DELETE'
+    });
+    // clear trips
+    clearListDom('.trips-container div');
+    // get data again
+    gatherTrip();
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 const timeToTrip = (date) => {
   const today = new Date();
@@ -10,102 +29,118 @@ const timeToTrip = (date) => {
   return difference;
 };
 
+const createTripEntry = (id,data) => {
+  const container = document.querySelector('.trips-container');
+  const {name, photos, weather, date} = data;
+  // build the container
+  const tripContainer = document.createDocumentFragment();
+  const tripDiv = document.createElement('div');
+  tripDiv.setAttribute('class', 'trip-entry');
+
+  // add the header - where are you going
+  const nameDiv = document.createElement('div');
+  nameDiv.setAttribute('class', 'trip-entry--location');
+  const location = document.createElement('h3');
+  // show how long until the trip
+  const timeLeft = timeToTrip(date);
+  if (timeLeft < 1) {
+    location.innerHTML = `${name} <span>Less than a day to go - <a href="#" data-id="${id}">Remove</a></span>`;
+  } else {
+    location.innerHTML = `${name} <span>${Math.floor(timeLeft)} days to go - <a href="#" data-id="${id}">Remove</a></span>`;
+  }
+  // remove link
+  nameDiv.appendChild(location);
+
+  // show the weather on the place
+  const weatherInfo = document.createElement('p');
+  weatherInfo.innerHTML = `${weather.temp}℃`;
+  weatherInfo.setAttribute('class', 'temperature');
+  nameDiv.appendChild(weatherInfo);
+
+  // show the weather icon on the place
+  const weatherIcon = document.createElement('img');
+  weatherIcon.setAttribute('src', `https://www.weatherbit.io/static/img/icons/${weather.weather.icon}.png`);
+  weatherIcon.setAttribute('alt', weather.weather.description);
+  nameDiv.appendChild(weatherIcon);
+
+  // append the name and weather to the location div
+  tripDiv.appendChild(nameDiv);
+
+  // Display some photos
+  const photosList = document.createDocumentFragment();
+  const photoDiv = document.createElement('div');
+  photoDiv.setAttribute('class', 'trip-entry--photos');
+
+  for (let photo of photos.hits) {
+    const newPhoto = document.createElement('img');
+    // add latitude and longitude
+    newPhoto.setAttribute('src', photo.previewURL);
+    newPhoto.setAttribute('alt', photo.tags);
+    photoDiv.appendChild(newPhoto);
+  }
+  photosList.appendChild(photoDiv);
+
+  // append them to the navigation
+  tripDiv.appendChild(photosList); // append the photos to the overall container
+
+  // add the whole thing to the container
+  tripContainer.appendChild(tripDiv);
+  container.appendChild(tripContainer);
+};
+
+
 const populateTrip = (data) => {
+  console.log(data);
   if (Object.entries(data).length !== 0) { // if there's an entry already
-    const container = document.querySelector('.trips-container');
-    const {name, photos, weather, date} = data;
-
-    // build the container
-    const tripContainer = document.createDocumentFragment();
-    const tripDiv = document.createElement('div');
-    tripDiv.setAttribute('class', 'trip-entry');
-    tripDiv.setAttribute('data-leg', '1');
-
-    // add the header - where are you going
-    const nameDiv = document.createElement('div');
-    nameDiv.setAttribute('class', 'trip-entry--location');
-    const location = document.createElement('h3');
-    // show how long until the trip
-    const timeLeft = timeToTrip(date);
-    if (timeLeft < 1) {
-      location.innerHTML = `${name} <span>Less than a day to go</span>`;
-    } else {
-      location.innerHTML = `${name} <span>${Math.floor(timeLeft)} days to go</span>`;
+    clearListDom('.trips-container div'); // clear any data first
+    for (let trip in data) {
+      console.log("trip is:", data[trip]);
+      createTripEntry(trip, data[trip]);
     }
-    nameDiv.appendChild(location);
-
-
-    // show the weather on the place
-    const weatherInfo = document.createElement('p');
-    weatherInfo.innerHTML = `${weather.temp}℃`;
-    weatherInfo.setAttribute('class', 'temperature');
-    nameDiv.appendChild(weatherInfo);
-
-    // show the weather icon on the place
-    const weatherIcon = document.createElement('img');
-    weatherIcon.setAttribute('src', `https://www.weatherbit.io/static/img/icons/${weather.weather.icon}.png`);
-    weatherIcon.setAttribute('alt', weather.weather.description);
-    nameDiv.appendChild(weatherIcon);
-
-    // append the name and weather to the location div
-    tripDiv.appendChild(nameDiv);
-
-
-
-    // Display some photos
-    const photosList = document.createDocumentFragment();
-    const photoDiv = document.createElement('div');
-    photoDiv.setAttribute('class', 'trip-entry--photos');
-
-    for (let photo of photos.hits) {
-      const newPhoto = document.createElement('img');
-      // add latitude and longitude
-      newPhoto.setAttribute('src', photo.previewURL);
-      newPhoto.setAttribute('alt', photo.tags);
-      photoDiv.appendChild(newPhoto);
-    }
-    photosList.appendChild(photoDiv);
-
-    // append them to the navigation
-    tripDiv.appendChild(photosList); // append the photos to the overall container
-
-    // add the whole thing to the container
-    tripContainer.appendChild(tripDiv);
-    container.appendChild(tripContainer);
-
     // make the thing visible
     document.querySelector('.trips-container').classList.add('visible');
     // move the content to the top
     document.querySelector('.wrapper').classList.add('results');
+    // attach event listeners foe the remove links
+    const removeLinks = document.querySelectorAll('.trip-entry a');
+    // for (let link of removeLinks) {
+    //   console.log(link);
+    // }
+    // console.log(removeLinks);
+    let links = [...removeLinks].map(link => link.addEventListener('click', deleteAnEntry));
+    // console.log(links);
   }
 };
 
 
 export const gatherTrip = async () => {
   const url = 'http://localhost:8080/api/trip';
+  const headers = new Headers();
+  headers.append('pragma', 'no-cache');
+  headers.append('cache-control', 'no-cache');
   try {
-    const response = await fetch(url);
+    const response = await fetch(url, headers);
     const result = await response.json();
     populateTrip(result);
+    console.log("data from backend", result);
   } catch (error) {
     console.error(error);
   }
 };
 
+
 const buildTripEntry = async (name, weather, photos, date) => {
-  // const date = new Date();
-  // const rightNow = date.toLocaleString('en-gb',{
-  //   dateStyle: 'long',
-  //   timeStyle: 'short'
-  // });
-  console.log("the photos", photos);
+  let id = uuidv4();
   return {
-    'date': date,
-    'name': name,
-    'weather': weather,
-    'photos': photos
+    [id]: {
+      'date': date,
+      'name': name,
+      'weather': weather,
+      'photos': photos
+    }
   };
 };
+
 
 export const selectDestination = (e) => {
   const target = e.target;
@@ -175,12 +210,13 @@ export const storeTrip = async (e) => {
       body: JSON.stringify(tripEntry)
     });
     let result = await response.json();
-    result.code === 200 ? gatherTrip() : null;
-    console.log(result);
+    result.code === 201 ? gatherTrip() : null;
+    // console.log(result);
   } catch (error) {
     console.error(error);
   }
 };
+
 
 const getPhotos = async (name) => {
   const pixabayKey = process.env.PIXABAY_KEY;

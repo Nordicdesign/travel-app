@@ -10,7 +10,6 @@ const placeDetails = async (place) => {
   try {
     const response = await fetch(apiUrl);
     const result = await response.json();
-    console.log(result.geonames);
     displayPlaces(result.geonames);
   } catch (error) {
     console.error(error);

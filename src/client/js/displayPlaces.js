@@ -1,3 +1,5 @@
+import { clearListDom } from './utils';
+
 const orderByPopulation = (places) => {
   const ordered = places.sort((a, b) => b.population - a.population);
   return ordered;
@@ -15,10 +17,6 @@ export const createArrayOfPlaces = (places) => {
   return places;
 };
 
-export const clearListDom = (el) => {
-  const listToDelete = document.querySelectorAll(el);
-  listToDelete.forEach(li => li.remove());
-};
 
 const displayPlaces = (results) => {
   clearListDom('.places-list ul li');
