@@ -1,7 +1,9 @@
+@use "sass:math";
+
 // FORM MIXINS
 @mixin form-field {
   padding: $baseline;
-  margin: $baseline/2 0 $baseline;
+  margin: math.div($baseline,2) 0 $baseline;
 }
 
 @mixin form-shadow {
