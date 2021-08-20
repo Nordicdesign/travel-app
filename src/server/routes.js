@@ -9,7 +9,6 @@ const {
 } = require('./utils');
 
 router.get('/trip', async function(req, res) {
-  // console.log("sending data::::", projectData);
   res.send(projectData);
 });
 
@@ -33,7 +32,6 @@ router.post('/trip', async function(req, res) {
 
 
 router.delete('/trip/:id', async function(req,res) {
-  // console.log("the data is::: ", projectData);
   try {
     let response = {
       'code': 204,
@@ -41,7 +39,6 @@ router.delete('/trip/:id', async function(req,res) {
     };
     deleteTripEntry(req.params.id)
       .then(() => {
-        console.log("the data about to be sent ::: ", projectData);
         res.send(response);
       });
   } catch (error) {
@@ -54,10 +51,8 @@ router.delete('/trip/:id', async function(req,res) {
 });
 
 router.post('/weather', async function(req, res) {
-  // console.log(req.body);
   const { type, lat, lon, weatherDay } = req.body;
   const result = await getWeatherData(lat,lon, type, weatherDay);
-  // console.log(result);
   res.send(result);
 });
 

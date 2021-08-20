@@ -27,7 +27,6 @@ async function getWeatherData(lat,lon, type, weatherDay) {
       };
     }
     let weatherData = await response.json();
-    // console.log(weatherData);
     return weatherData.data[when];
   } catch(error) {
     console.log(error);
@@ -51,18 +50,6 @@ async function getWeatherData(lat,lon, type, weatherDay) {
 let projectData = {};
 const saveTripData = data => Object.assign(projectData, data);
 const deleteTripEntry = id => delete projectData[id];
-// let projectData = [];
-// const saveTripData = (data) => projectData.push(data);
-
-// const deleteTripEntry = async (id) => {
-//   console.log("id to delete ",id);
-//   // const entry = projectData.find(e => e.id === id);
-//   console.log("data before::: ", projectData);
-//   newData = projectData.filter(e => e.id !== id);
-//   projectData = newData;
-//   console.log("data after deletion::: ", projectData);
-//   return true;
-// };
 
 module.exports = {
   getWeatherData,

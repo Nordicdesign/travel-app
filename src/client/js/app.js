@@ -90,11 +90,9 @@ const createTripEntry = (id,data) => {
 
 
 const populateTrip = (data) => {
-  console.log(data);
   if (Object.entries(data).length !== 0) { // if there's an entry already
     clearListDom('.trips-container div'); // clear any data first
     for (let trip in data) {
-      console.log("trip is:", data[trip]);
       createTripEntry(trip, data[trip]);
     }
     // make the thing visible
@@ -103,12 +101,7 @@ const populateTrip = (data) => {
     document.querySelector('.wrapper').classList.add('results');
     // attach event listeners foe the remove links
     const removeLinks = document.querySelectorAll('.trip-entry a');
-    // for (let link of removeLinks) {
-    //   console.log(link);
-    // }
-    // console.log(removeLinks);
     let links = [...removeLinks].map(link => link.addEventListener('click', deleteAnEntry));
-    // console.log(links);
   }
 };
 
@@ -122,7 +115,6 @@ export const gatherTrip = async () => {
     const response = await fetch(url, headers);
     const result = await response.json();
     populateTrip(result);
-    console.log("data from backend", result);
   } catch (error) {
     console.error(error);
   }
@@ -191,7 +183,6 @@ export const storeTrip = async (e) => {
 
   // gather the weather
   const weather = await getWeatherData(lat,lon,weatherType,weatherDay);
-  console.log(weather);
 
   //gather the photos
   const photos = await getPhotos(name);
@@ -211,7 +202,6 @@ export const storeTrip = async (e) => {
     });
     let result = await response.json();
     result.code === 201 ? gatherTrip() : null;
-    // console.log(result);
   } catch (error) {
     console.error(error);
   }

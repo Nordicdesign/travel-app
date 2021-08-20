@@ -27,13 +27,3 @@ test('list is created from an array', () => {
   }];
   expect(createArrayOfPlaces(list)).toMatchObject(expectedResult);
 });
-
-// test('populated list of places is cleared', () => {
-//   // Set up our document body
-//   document.body.innerHTML =
-//     '<div class="places-list">' +
-//     '  <ul>' +
-//     '  <li>London</li>' +
-//     '  </ul> ' +
-//     '</div>';
-// });

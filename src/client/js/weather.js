@@ -17,7 +17,6 @@ export const getWeatherData = async (lat,lon, type, weatherDay) => {
       body: JSON.stringify(payload)
     });
     let weatherData = await response.json();
-    console.log(weatherData);
     return weatherData;
   } catch(error) {
     console.log(error);
