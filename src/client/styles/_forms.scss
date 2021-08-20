@@ -8,6 +8,7 @@ label {
   text-shadow: 1px 1px 2px rgba(0, 0, 0, .8);
 }
 
+input,
 input[type="date"],
 input[type="text"] {
   @include form-field;
@@ -27,7 +28,7 @@ input[type="submit"] {
   line-height: 1.3;
   color: white;
   border-radius: 4px;
-  min-width: 150px;
+  width: 150px;
   height: 48px;
   cursor: pointer;
   transition: 0.2s all ease;
